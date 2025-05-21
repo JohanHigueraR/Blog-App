@@ -18,6 +18,55 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type User {
+  id: Int!
+  name: String!
+  email: String!
+  bio: String
+  avatar: String
+  post: [Post!]!
+  comments: [Post!]!
+}
+
+type CommentEntity {
+  id: Int!
+  content: String!
+  post: Post!
+  author: User!
+  createdAt: DateTime!
+}
+
+type Tag {
+  id: Int!
+  name: String!
+  post: [Post!]!
+}
+
+type AuthPayload {
+  id: Int!
+  name: String!
+  avatar: String
+  accessToken: String!
+}
+
 type Query {
   posts: [Post!]!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  signIn(signInInput: SignInInput!): AuthPayload!
+}
+
+input CreateUserInput {
+  name: String!
+  password: String!
+  email: String!
+  bio: String
+  avatar: String
+}
+
+input SignInInput {
+  email: String!
+  password: String!
 }
