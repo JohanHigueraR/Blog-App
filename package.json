@@ -10,7 +10,7 @@
     "format": "turbo run format"
   },
   "packageManager": "npm@10.9.2",
-  "workspaces":[
+  "workspaces": [
     "apps/*"
   ],
   "keywords": [],
@@ -19,5 +19,8 @@
   "description": "",
   "devDependencies": {
     "turbo": "^2.5.3"
+  },
+  "dependencies": {
+    "zod": "^3.25.20"
   }
 }
