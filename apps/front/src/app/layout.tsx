@@ -5,6 +5,9 @@ import DesktopNavbar from "@/components/navbar/DesktopNavbar";
 import NavBar from "@/components/navbar/NavBar";
 import NavbarContainer from "@/components/navbar/NavBarContainer";
 import Post from "@/components/post/Post";
+import Providers from "./providers";
+import { Toaster } from "@/components/ui/sonner";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,11 +34,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NavbarContainer>
-          <NavBar></NavBar>
-        </NavbarContainer>
-        {children}
-        {<Post posts={[]}></Post>}
+        <Providers>
+          <NavbarContainer>
+            <NavBar></NavBar>
+          </NavbarContainer>
+          {children}
+          <Toaster></Toaster>
+        </Providers>
       </body>
     </html>
   );
