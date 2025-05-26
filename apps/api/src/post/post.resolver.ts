@@ -5,17 +5,13 @@ import { CreatePostInput } from './dto/create-post.input';
 import { UpdatePostInput } from './dto/update-post.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { DEFAULT_PAGE_SIZE } from 'src/constants';
 
 @Resolver(() => Post)
 export class PostResolver {
   constructor(private readonly postService: PostService) {}
 
-  /*   @Mutation(() => Post)
-  createPost(@Args('createPostInput') createPostInput: CreatePostInput) {
-    return this.postService.create(createPostInput);
-  } */
-
-  /* @UseGuards(JwtAuthGuard) */
+  // @UseGuards(JwtAuthGuard)
   @Query(() => [Post], { name: 'posts' })
   findAll(
     @Context() context,
@@ -38,18 +34,57 @@ export class PostResolver {
     return this.postService.findOne(id);
   }
 
-  /*   @Query(() => Post, { name: 'post' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.postService.findOne(id);
+  @UseGuards(JwtAuthGuard)
+  @Query(() => [Post])
+  getUserPosts(
+    @Context() context,
+    @Args('skip', { nullable: true, type: () => Int }) skip?: number,
+    @Args('take', { nullable: true, type: () => Int }) take?: number,
+  ) {
+    const userId = context.req.user.id;
+    return this.postService.findByUser({
+      userId,
+      skip: skip ?? 0,
+      take: take ?? DEFAULT_PAGE_SIZE,
+    });
   }
 
-  @Mutation(() => Post)
-  updatePost(@Args('updatePostInput') updatePostInput: UpdatePostInput) {
-    return this.postService.update(updatePostInput.id, updatePostInput);
+  @UseGuards(JwtAuthGuard)
+  @Query(() => Int)
+  userPostCount(@Context() context) {
+    const userId = context.req.user.id;
+    return this.postService.userPostCount(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Mutation(() => Post)
-  removePost(@Args('id', { type: () => Int }) id: number) {
-    return this.postService.remove(id);
-  } */
+  createPost(
+    @Context() context,
+    @Args('createPostInput') createPostInput: CreatePostInput,
+  ) {
+    const authorId = context.req.user.id;
+
+    return this.postService.create({ createPostInput, authorId });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => Post)
+  updatePost(
+    @Context() context,
+
+    @Args('updatePostInput') updatePostInput: UpdatePostInput,
+  ) {
+    const userId = context.req.user.id;
+    return this.postService.update({ userId, updatePostInput });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => Boolean)
+  deletePost(
+    @Context() context,
+    @Args('postId', { type: () => Int }) postId: number,
+  ) {
+    const userId = context.req.user.id;
+    return this.postService.delete({ postId, userId });
+  }
 }

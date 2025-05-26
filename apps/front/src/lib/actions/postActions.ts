@@ -13,10 +13,12 @@ import {
 
 import { PostType } from "../types/modelTypes";
 import { PostFormState } from "../types/formState";
-import { PostFormSchema } from "../zodSchemas/postFormSchema";
-import { uploadThumbnail } from "../upload";
+
+
 import { transformTakeSkip } from "../helpers";
 import { authFetchGraphQL, fetchGraphQL } from "../fetchGrapghQl";
+import { PostFormSchema } from "../zodSchemas/postFormSchema";
+import { uploadThumbnail } from "../upload";
 
 export const fetchPosts = async ({
   page,
