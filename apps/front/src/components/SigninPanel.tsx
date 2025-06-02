@@ -3,8 +3,8 @@ import Link from "next/link";
 const SignInPanel = () => {
   return (
     <>
-      <Link href={"/auth/signin"}>Sign In</Link>
-      <Link href={"/auth/signup"}>Sign Up</Link>
+      <Link href={"/auth/signin"}>Iniciar Sesión</Link>
+      <Link href={"/auth/signup"}>Registrarse</Link>
     </>
   );
 };

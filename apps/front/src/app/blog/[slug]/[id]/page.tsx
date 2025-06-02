@@ -1,6 +1,5 @@
 import { fetchPostById } from "@/lib/actions/postActions";
 import Image from "next/image";
-import DOMPurify from "dompurify";
 
 import Comments from "./_components/comments";
 import { getSession } from "@/lib/session";

@@ -1,86 +1,171 @@
+"use client";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Image from "next/image";
-import React from "react";
+import { useRef } from "react";
 
-function Hero() {
+export default function Hero() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll y suavizado
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    damping: 25,
+    stiffness: 300,
+    restDelta: 0.001,
+  });
+
+  // Primera sección (entrada/salida)
+  const firstSection = {
+    scale: useTransform(smoothProgress, [0, 0.2], [1, 1]),
+    opacity: useTransform(smoothProgress, [0, 0.3], [1, 0]),
+    y: useTransform(smoothProgress, [0, 0.3], [0, -300]),
+    gradientHeight: useTransform(smoothProgress, [0, 0.3], ["0%", "100%"]),
+  };
+
+  // Segunda sección (entrada y salida)
+  const secondSection = {
+    opacity: useTransform(smoothProgress, [0.1, 0.3, 0.5, 0.6], [0, 1, 0.8, 0]),
+    y: useTransform(smoothProgress, [0.1, 0.3], [100, 0]),
+  };
+
   return (
-    <div className="bg-gradient-to-br from-sky-500 to-indigo-500 text-white pt-24">
-      <div className="container mx-auto flex flex-col md:flex-row items-center px-5">
-        {/* Columna izquierda */}
-        <div className="flex flex-col w-full md:w-1/2 text-center md:text-left mb-10 md:mb-0">
-          <p className="text-lg md:text-xl font-semibold tracking-wider mb-4 animate-pulse">
-            ✨ DESCUBRE, APRENDE, INSPÍRATE ✨
-          </p>
-
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-            Transforma tu conocimiento{" "}
-            <span className="text-yellow-300">con cada lectura</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl mb-8 leading-relaxed">
-            Artículos cautivadores que despertarán tu curiosidad y expandirán
-            tus horizontes.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <button className="bg-white text-indigo-600 hover:bg-indigo-100 font-bold py-3 px-6 rounded-full text-lg transition duration-300 transform hover:scale-105">
-              Explora los artículos
-            </button>
-            <button className="border-2 border-white text-white hover:bg-white hover:text-indigo-600 font-bold py-3 px-6 rounded-full text-lg transition duration-300 transform hover:scale-105">
-              Únete a la comunidad
-            </button>
-          </div>
+    <div ref={containerRef} className="relative h-[200vh]">
+      {/* Primera sección */}
+      <motion.section
+        style={{
+          scale: firstSection.scale,
+          opacity: firstSection.opacity,
+          y: firstSection.y,
+        }}
+        className="sticky top-0 min-h-screen bg-cover bg-center bg-[url('/heroSection.png')] text-white flex items-center justify-center shadow-[inset_0_-100px_50px_-25px_#0e1101]"
+      >
+        <div className="absolute inset-0 bg-black/30" />
+        <motion.div
+          style={{ height: firstSection.gradientHeight }}
+          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0e1101] via-[#0e1101] to-transparent"
+        />
+        <div className="container relative flex flex-col items-center justify-center px-4 text-center min-h-screen">
+          <motion.h1
+            className="text-5xl md:text-7xl font-bold mb-4"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            Bitácora Nómada
+          </motion.h1>
+          <motion.h3
+            className="text-xl md:text-2xl max-w-2xl"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            Un recorrido por el mundo a través de palabras.
+          </motion.h3>
         </div>
+      </motion.section>
 
-        {/* Columna derecha - Puedes añadir una imagen ilustrativa aquí */}
-        <div className="w-full md:w-3/5 text-center py-7 flex justify-center">
-          <Image
-            
-            src={"/hero.png"}
-            alt="hero section"
-            width={600}
-            height={600}
-            
-          ></Image>
+      {/* Segunda sección */}
+      <motion.section
+        style={secondSection}
+        className="sticky top-0 min-h-screen bg-[#0e1101] flex items-center justify-center overflow-hidden"
+      >
+        <div className="container flex flex-col lg:flex-row items-center justify-center px-4 gap-8 lg:gap-12 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, rotate: -5, y: 50 }}
+            whileInView={{
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+              y: 0,
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 150,
+              damping: 20,
+              delay: 0.2,
+            }}
+            viewport={{ once: true }}
+            className="relative w-full max-w-sm aspect-[4/5] rounded-xl overflow-hidden shadow-2xl"
+          >
+            <Image
+              src="/section-img-1.jpg"
+              fill
+              quality={100}
+              alt="Blog preview"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 border-2 border-white/10 rounded-xl pointer-events-none" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-xl"
+          >
+            <motion.span
+              className="text-sm font-semibold text-green-300 mb-2 tracking-wider"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              viewport={{ once: true }}
+            >
+              BITÁCORA DE VIAJES
+            </motion.span>
+
+            <motion.h2
+              className="text-3xl md:text-5xl font-bold mb-6 text-white"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              viewport={{ once: true }}
+            >
+              Explora <span className="text-green-300">Historias</span> Únicas
+            </motion.h2>
+
+            <motion.p
+              className="text-lg text-white/80 mb-8 leading-relaxed"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              viewport={{ once: true }}
+            >
+              Sumérgete en relatos cautivadores que te transportarán a los
+              rincones más fascinantes del mundo. Cada entrada es una ventana a
+              nuevas aventuras.
+            </motion.p>
+
+            <motion.button
+              className="px-8 py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-full font-medium flex items-center gap-2 transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <span>Explorar Posts</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </motion.button>
+          </motion.div>
         </div>
-      </div>
-      <div className="relative -mt-10 lg:-mt-24">
-        <svg
-          viewBox="0 0 1428 174"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-            <g
-              transform="translate(-2.000000, 44.000000)"
-              fill="#FFFFFF"
-              fillRule="nonzero"
-            >
-              <path
-                d="M0,0 C90.7283404,0.927527913 147.912752,27.187927 291.910178,59.9119003 C387.908462,81.7278826 543.605069,89.334785 759,82.7326078 C469.336065,156.254352 216.336065,153.6679 0,74.9732496"
-                opacity="0.100000001"
-              ></path>
-              <path
-                d="M100,104.708498 C277.413333,72.2345949 426.147877,52.5246657 546.203633,45.5787101 C666.259389,38.6327546 810.524845,41.7979068 979,55.0741668 C931.069965,56.122511 810.303266,74.8455141 616.699903,111.243176 C423.096539,147.640838 250.863238,145.462612 100,104.708498 Z"
-                opacity="0.100000001"
-              ></path>
-              <path
-                d="M1046,51.6521276 C1130.83045,29.328812 1279.08318,17.607883 1439,40.1656806 L1439,120 C1271.17211,77.9435312 1140.17211,55.1609071 1046,51.6521276 Z"
-                id="Path-4"
-                opacity="0.200000003"
-              ></path>
-            </g>
-            <g
-              transform="translate(-4.000000, 76.000000)"
-              fill="#FFFFFF"
-              fillRule="nonzero"
-            >
-              <path d="M0.457,34.035 C57.086,53.198 98.208,65.809 123.822,71.865 C181.454,85.495 234.295,90.29 272.033,93.459 C311.355,96.759 396.635,95.801 461.025,91.663 C486.76,90.01 518.727,86.372 556.926,80.752 C595.747,74.596 622.372,70.008 636.799,66.991 C663.913,61.324 712.501,49.503 727.605,46.128 C780.47,34.317 818.839,22.532 856.324,15.904 C922.689,4.169 955.676,2.522 1011.185,0.432 C1060.705,1.477 1097.39,3.129 1121.236,5.387 C1161.703,9.219 1208.621,17.821 1235.4,22.304 C1285.855,30.748 1354.351,47.432 1440.886,72.354 L1441.191,104.352 L1.121,104.031 L0.457,34.035 Z"></path>
-            </g>
-          </g>
-        </svg>
-      </div>
+      </motion.section>
     </div>
   );
 }
-
-export default Hero;

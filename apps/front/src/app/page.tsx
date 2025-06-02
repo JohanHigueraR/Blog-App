@@ -1,8 +1,7 @@
-
-import Hero from "@/components/Hero";
-import Posts from "@/components/post/Post";
+import { HeroContent } from "@/components/hero/HeroContent";
+import HeroIntro from "@/components/intro/HeroIntro";
+import LatestPost from "@/components/latestPost/LatestPost";
 import { fetchPosts } from "@/lib/actions/postActions";
-import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { getSession } from "@/lib/session";
 
 type Props = {
@@ -15,16 +14,18 @@ export default async function Home({ searchParams }: Props) {
     page: page ? +page : undefined,
   });
   const session = await getSession();
-  console.log("%c", "color: green; font-weight: bold;", { session });
 
   return (
-    <main>
-      <Hero />
-      <Posts
-        posts={posts}
-        currentPage={page ? +page : 1}
-        totalPages={Math.ceil(totalPosts / DEFAULT_PAGE_SIZE)}
-      />
+    <main className="bg-gray-950">
+      <section className="min-h-screen  ">
+        <HeroIntro></HeroIntro>
+      </section>
+      <section className="min-h-screen bg-accent ">
+        <HeroContent></HeroContent>
+      </section>
+      <section className="min-h-screen">
+        <LatestPost posts={posts}></LatestPost>
+      </section>
     </main>
   );
 }
